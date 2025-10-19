@@ -25,9 +25,6 @@ const STATE_RESTART = 2;
 const STATE_PLAY = 3;
 const STATE_GAMEOVER = 4;
 
-// sprites
-const PLAYER = 0;
-
 // ---------------------------------------------------------------------------------
 // Global Variables
 // ---------------------------------------------------------------------------------
@@ -65,17 +62,56 @@ class MainScene extends Phaser.Scene
 		this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgSky');
 		this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgHills');
 		this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgCity');
+		
 		// array of sprites that will be "manually" drawn on a rendering texture 
 		// (that's why they must be invisible after creation)
-		this.sprites = [
-			this.add.image(0, 0, 'imgPlayer').setVisible(false)
-		]
+		this.sprites = [];
+        const carColors = [
+            0x00BFFF, // Deep Sky Blue
+            0x4169E1, // Royal Blue
+            0xFFFACD, // Lemon Chiffon (Pale Yellow)
+            0xFFD700, // Gold
+            0xFFFFFF, // White
+            0xF5F5F5  // White Smoke (Off-white)
+        ];
+        const carNames = ["Corolla", "Camry", "Prius", "Mirai", "Toyota Crown", "Supra"];
+		const NUM_CARS = 6; 
+
+        // 1. Create the invisible car sprites
+        for (let i = 0; i < NUM_CARS; i++) {
+            let carSprite = this.add.image(0, 0, 'imgPlayer').setVisible(false);
+            carSprite.setTint(carColors[i]);
+            this.sprites.push(carSprite);
+        }
 		
 		// instances
+        // 2. Create the circuit (which creates this.graphics and this.texture)
 		this.circuit = new Circuit(this);
-		this.player = new Player(this);
+		
+        // 3. Create the text objects (now drawn ON TOP of the texture)
+        this.carNameTexts = []; 
+        for (let i = 0; i < NUM_CARS; i++) {
+            let nameText = this.add.text(0, 0, carNames[i], {
+                fontFamily: 'Arial Black', // Bolder font
+                fontSize: '80px', 
+                color: '#FFFFFF',
+                stroke: '#000000',
+                strokeThickness: 10 // Thicker stroke
+            }).setOrigin(0.5).setVisible(false); // Centered origin, initially invisible
+            this.carNameTexts.push(nameText);
+        }
+
+        // 4. Create the players, passing them their sprites and text
+		this.players = [];
+        for (let i = 0; i < NUM_CARS; i++) {
+            this.players.push(new Player(this, i, this.carNameTexts[i]));
+        }
+
 		this.camera = new Camera(this);
 		this.settings = new Settings(this);
+
+        // --- NEW --- Counter for off-screen cars guardrail
+        this.offScreenCarCount = 0;
 		
 		// listener to pause game
 		this.input.keyboard.on('keydown-P', function(){
@@ -97,14 +133,18 @@ class MainScene extends Phaser.Scene
 		switch(state){
 			case STATE_INIT:
 				this.camera.init();
-				this.player.init();
+				for(const player of this.players){
+					player.init();
+				}
 				
 				state = STATE_RESTART;
 				break;
 				
 			case STATE_RESTART:
 				this.circuit.create();
-				this.player.restart();
+				for(const player of this.players){
+					player.restart();
+				}
 				
 				state = STATE_PLAY;
 				break;
@@ -113,9 +153,19 @@ class MainScene extends Phaser.Scene
 				// duration of the time period
 				var dt = Math.min(1, delta/1000);
 		
-				this.player.update(dt);
-				this.camera.update();
+                // --- SPAM BUG FIX ---
+                // 1. Update camera position first
+                this.camera.update(dt);
+
+                // --- NEW --- Reset off-screen counter each frame
+                this.offScreenCarCount = 0;
+
+                // 2. Update all players relative to the new camera position
+				for(const player of this.players){
+					player.update(dt);
+				}
 				
+                // 3. Render the 3D world
 				this.circuit.render3D();
 				break;
 				
