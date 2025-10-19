@@ -89,55 +89,37 @@ export class NLPMatcher {
     return { primaryUse, mentions, keywords };
   }
 
-  analyzePriorityIntent(answer: string) {
-    const lower = answer.toLowerCase();
-    
-    const priorities = {
-      payment: /payment|monthly|afford|budget/i.test(lower),
-      fuel: /fuel|gas|mpg|economy|efficient/i.test(lower),
-      safety: /safety|safe|protect/i.test(lower),
-      tech: /tech|technology|carplay|android/i.test(lower),
-      reliability: /reliable|dependable|last|durable/i.test(lower),
-      space: /space|room|cargo|seats/i.test(lower),
-      style: /look|style|cool|fun|sporty/i.test(lower)
-    };
-    
-    const matched = Object.entries(priorities)
-      .filter(([key, regex]) => regex.test(lower))
-      .map(([key]) => key);
-    
-    let intensity: 'must_have' | 'important' | 'nice_to_have' = 'important';
-    if (/must|have to|need to|#1|most important/i.test(lower)) {
-      intensity = 'must_have';
-    } else if (/would like|prefer|hope/i.test(lower)) {
-      intensity = 'nice_to_have';
-    }
-    
-    return {
-      topPriority: matched[0] || 'reliability',
-      secondaryPriorities: matched.slice(1),
-      intensity
-    };
+analyzePriorityIntent(answer: string) {
+  const lower = answer.toLowerCase();
+  
+  const priorities = {
+    payment: /payment|monthly|afford|budget/i,
+    fuel: /fuel|gas|mpg|economy|efficient/i,
+    safety: /safety|safe|protect/i,
+    tech: /tech|technology|carplay|android/i,
+    reliability: /reliable|dependable|last|durable/i,
+    space: /space|room|cargo|seats/i,
+    style: /look|style|cool|fun|sporty/i
+  };
+  
+  // ✅ FIX: Filter correctly
+  const matched = Object.entries(priorities)
+    .filter(([key, regex]) => regex.test(lower))  // ✅ regex is already a RegExp
+    .map(([key]) => key);
+  
+  let intensity: 'must_have' | 'important' | 'nice_to_have' = 'important';
+  if (/must|have to|need to|#1|most important/i.test(lower)) {
+    intensity = 'must_have';
+  } else if (/would like|prefer|hope/i.test(lower)) {
+    intensity = 'nice_to_have';
   }
-
-  detectTradeInMention(answer: string) {
-    const lower = answer.toLowerCase();
-    
-    if (!/trade|sell my|current|have a/i.test(lower)) {
-      return { hasTradeIn: false };
-    }
-    
-    const vehicleMatch = answer.match(/(\d{4})?\s*([A-Z][a-z]+)\s+([A-Z][a-z]+)/i);
-    const vehicle = vehicleMatch ? vehicleMatch[0] : undefined;
-    
-    const valueMatch = answer.match(/\$?\s*(\d+)[,]?(\d+)?k?/i);
-    let estimatedValue = undefined;
-    if (valueMatch) {
-      estimatedValue = parseInt(valueMatch[1]) * (valueMatch[0].includes('k') ? 1000 : 1);
-    }
-    
-    return { hasTradeIn: true, vehicle, estimatedValue };
-  }
+  
+  return {
+    topPriority: matched[0] || 'reliability',
+    secondaryPriorities: matched.slice(1),
+    intensity
+  };
+}
 }
 
 export default NLPMatcher;
