@@ -92,19 +92,16 @@ export class NLPMatcher {
   analyzePriorityIntent(answer: string) {
     const lower = answer.toLowerCase();
     
-    const priorities = {
-      payment: /payment|monthly|afford|budget/i.test(lower),
-      fuel: /fuel|gas|mpg|economy|efficient/i.test(lower),
-      safety: /safety|safe|protect/i.test(lower),
-      tech: /tech|technology|carplay|android/i.test(lower),
-      reliability: /reliable|dependable|last|durable/i.test(lower),
-      space: /space|room|cargo|seats/i.test(lower),
-      style: /look|style|cool|fun|sporty/i.test(lower)
-    };
+    const matched: string[] = [];
     
-    const matched = Object.entries(priorities)
-      .filter(([key, regex]) => regex.test(lower))
-      .map(([key]) => key);
+    // Check each priority manually
+    if (/payment|monthly|afford|budget/i.test(lower)) matched.push('payment');
+    if (/fuel|gas|mpg|economy|efficient/i.test(lower)) matched.push('fuel');
+    if (/safety|safe|protect/i.test(lower)) matched.push('safety');
+    if (/tech|technology|carplay|android/i.test(lower)) matched.push('tech');
+    if (/reliable|dependable|last|durable/i.test(lower)) matched.push('reliability');
+    if (/space|room|cargo|seats/i.test(lower)) matched.push('space');
+    if (/look|style|cool|fun|sporty/i.test(lower)) matched.push('style');
     
     let intensity: 'must_have' | 'important' | 'nice_to_have' = 'important';
     if (/must|have to|need to|#1|most important/i.test(lower)) {

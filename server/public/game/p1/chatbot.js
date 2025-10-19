@@ -16,13 +16,11 @@ const elements = {
   loadingContainer: document.getElementById('loadingContainer'),
   loadingText: document.getElementById('loadingText'),
   questionContainer: document.getElementById('questionContainer'),
-  questionHeader: document.getElementById('questionHeader'),
   questionCategory: document.getElementById('questionCategory'),
   questionText: document.getElementById('questionText'),
   questionSubtext: document.getElementById('questionSubtext'),
   replayAudio: document.getElementById('replayAudio'),
   replayText: document.getElementById('replayText'),
-  answerSection: document.getElementById('answerSection'),
   answerInput: document.getElementById('answerInput'),
   examplesContainer: document.getElementById('examplesContainer'),
   examplesList: document.getElementById('examplesList'),
@@ -32,7 +30,9 @@ const elements = {
   backButton: document.getElementById('backButton'),
   errorMessage: document.getElementById('errorMessage'),
   errorText: document.getElementById('errorText'),
-  ttsAudio: document.getElementById('ttsAudio')
+  ttsAudio: document.getElementById('ttsAudio'),
+  chatRoot: document.getElementById('chatRoot'),
+  questionBanner: document.querySelector('.question-banner')
 };
 
 // ===== INITIALIZATION =====
@@ -45,43 +45,55 @@ function init() {
 // ===== EVENT LISTENERS =====
 function attachEventListeners() {
   // Submit button
-  elements.submitButton.addEventListener('click', handleSubmit);
+  if (elements.submitButton) {
+    elements.submitButton.addEventListener('click', handleSubmit);
+  }
   
   // Enter key to submit (Shift+Enter for new line)
-  elements.answerInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
-    }
-  });
+  if (elements.answerInput) {
+    elements.answerInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      }
+    });
+  }
 
   // TTS toggle
-  elements.ttsToggle.addEventListener('click', toggleTTS);
+  if (elements.ttsToggle) {
+    elements.ttsToggle.addEventListener('click', toggleTTS);
+  }
 
   // Replay audio
-  elements.replayAudio.addEventListener('click', replayAudio);
+  if (elements.replayAudio) {
+    elements.replayAudio.addEventListener('click', replayAudio);
+  }
 
   // Back button
-  elements.backButton.addEventListener('click', handleBack);
+  if (elements.backButton) {
+    elements.backButton.addEventListener('click', handleBack);
+  }
 
-  // Audio ended event
-  elements.ttsAudio.addEventListener('ended', () => {
-    isPlaying = false;
-    elements.replayText.textContent = 'Replay question';
-  });
+  // Audio events
+  if (elements.ttsAudio) {
+    elements.ttsAudio.addEventListener('ended', () => {
+      isPlaying = false;
+      if (elements.replayText) {
+        elements.replayText.textContent = 'Replay question';
+      }
+    });
 
-  // Audio error event
-  elements.ttsAudio.addEventListener('error', () => {
-    console.error('Failed to load audio');
-    isPlaying = false;
-  });
+    elements.ttsAudio.addEventListener('error', () => {
+      console.error('Failed to load audio');
+      isPlaying = false;
+    });
+  }
 }
 
 // ===== GAME FLOW =====
-
 async function startGame() {
   try {
-    console.log('Calling /api/game/start with userId:', userId); 
+    console.log('🎮 Starting game with userId:', userId);
     
     const response = await fetch(`${API_BASE_URL}/game/start`, {
       method: 'POST',
@@ -89,26 +101,22 @@ async function startGame() {
       body: JSON.stringify({ userId, ttsEnabled })
     });
 
-    console.log('Response status:', response.status); 
-    console.log('Response ok:', response.ok); 
-
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error response:', errorData); 
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Success! Data:', data); 
+    console.log('✅ Game started successfully');
     displayQuestion(data);
     
   } catch (error) {
-    console.error('Error starting game:', error); // This is already there
+    console.error('❌ Error starting game:', error);
     showError('Failed to start game. Please refresh the page.');
   }
 }
+
 async function handleSubmit() {
-  const answer = elements.answerInput.value.trim();
+  const answer = elements.answerInput?.value.trim();
   
   if (!answer) {
     showError('Please enter an answer');
@@ -118,7 +126,14 @@ async function handleSubmit() {
   if (!currentQuestion) return;
 
   // Disable submit button
-  elements.submitButton.disabled = true;
+  if (elements.submitButton) {
+    elements.submitButton.disabled = true;
+  }
+  
+  // Add user message bubble
+  if (window.addBubble) {
+    window.addBubble(answer, 'right');
+  }
   
   // Save to history
   questionHistory.push({
@@ -153,7 +168,10 @@ async function handleSubmit() {
     const data = await response.json();
 
     if (data.complete) {
-      // Journey complete - show final message then redirect
+      // Journey complete - redirect to race results
+      if (window.addBubble) {
+        window.addBubble('Journey complete! Analyzing your matches...', 'left');
+      }
       setTimeout(() => {
         window.location.href = '/analyst/index.html';
       }, currentQuestion.loadingTransition?.duration || 3000);
@@ -166,10 +184,12 @@ async function handleSubmit() {
     }
     
   } catch (error) {
-    console.error('Error submitting answer:', error);
+    console.error('❌ Error submitting answer:', error);
     hideLoading();
     showError('Failed to submit answer. Please try again.');
-    elements.submitButton.disabled = false;
+    if (elements.submitButton) {
+      elements.submitButton.disabled = false;
+    }
   }
 }
 
@@ -177,64 +197,86 @@ function displayQuestion(data) {
   const { question, progress } = data;
   currentQuestion = question;
 
-  // Update question content
-  elements.questionText.textContent = question.text;
-  elements.questionSubtext.textContent = question.subtext || '';
-  
-  // Reset answer input
-  elements.answerInput.value = '';
-  elements.answerInput.placeholder = question.placeholder;
-  
-  // Show/hide subtext
-  if (question.subtext) {
-    elements.questionSubtext.style.display = 'block';
-  } else {
-    elements.questionSubtext.style.display = 'none';
+  console.log('📋 Displaying question:', question.id);
+
+  // Update question banner
+  if (elements.questionCategory) {
+    elements.questionCategory.textContent = `Question ${progress.current} of ${progress.total}`;
   }
 
-  // Update examples (limit to 2)
-  if (question.examples && question.examples.length > 0) {
-    elements.examplesContainer.style.display = 'block';
-    elements.examplesList.innerHTML = question.examples
-      .slice(0, 2)
-      .map(ex => `<span>"${ex}"</span>`)
-      .join(' · ');
-  } else {
-    elements.examplesContainer.style.display = 'none';
+  if (elements.questionText) {
+    elements.questionText.textContent = question.text;
+  }
+
+  if (elements.questionSubtext) {
+    elements.questionSubtext.textContent = question.subtext || '';
+    elements.questionSubtext.style.display = question.subtext ? 'block' : 'none';
+  }
+
+  // Add assistant message bubble (optional)
+  if (window.addBubble && progress.current > 1) {
+    window.addBubble(question.text, 'left');
+  }
+  
+  // Reset answer input
+  if (elements.answerInput) {
+    elements.answerInput.value = '';
+    elements.answerInput.placeholder = question.placeholder || 'Type your answer here...';
+    elements.answerInput.focus();
+  }
+
+  // Update examples
+  if (elements.examplesContainer && elements.examplesList) {
+    if (question.examples && question.examples.length > 0) {
+      elements.examplesContainer.style.display = 'block';
+      elements.examplesList.innerHTML = question.examples
+        .slice(0, 2)
+        .map(ex => `<span>"${ex}"</span>`)
+        .join(' · ');
+    } else {
+      elements.examplesContainer.style.display = 'none';
+    }
   }
 
   // Update tooltip
-  if (question.tooltip) {
-    elements.tooltip.style.display = 'block';
-    elements.tooltipText.textContent = question.tooltip;
-  } else {
-    elements.tooltip.style.display = 'none';
+  if (elements.tooltip && elements.tooltipText) {
+    if (question.tooltip) {
+      elements.tooltip.style.display = 'block';
+      elements.tooltipText.textContent = question.tooltip;
+    } else {
+      elements.tooltip.style.display = 'none';
+    }
   }
 
   // Show/hide replay button
-  if (question.tts && question.tts.enabled && ttsEnabled) {
-    elements.replayAudio.style.display = 'inline-block';
-  } else {
-    elements.replayAudio.style.display = 'none';
+  if (elements.replayAudio) {
+    if (question.tts && question.tts.enabled && ttsEnabled) {
+      elements.replayAudio.style.display = 'inline-block';
+    } else {
+      elements.replayAudio.style.display = 'none';
+    }
   }
 
   // Enable submit button
-  elements.submitButton.disabled = false;
+  if (elements.submitButton) {
+    elements.submitButton.disabled = false;
+  }
 
   // Auto-play TTS
   if (question.tts && question.tts.enabled && question.tts.audioUrl && ttsEnabled) {
     playAudio(question.tts.audioUrl);
   }
-
-  // Focus input
-  elements.answerInput.focus();
 }
 
 // ===== LOADING WITH TYPING ANIMATION =====
 function showLoading(messages, duration) {
-  // Hide question, show loading
-  elements.questionContainer.style.display = 'none';
-  elements.loadingContainer.style.display = 'block';
+  // Hide question banner, show loading
+  if (elements.questionBanner) {
+    elements.questionBanner.style.display = 'none';
+  }
+  if (elements.loadingContainer) {
+    elements.loadingContainer.style.display = 'block';
+  }
   
   // Pick a random message
   const message = messages[Math.floor(Math.random() * messages.length)];
@@ -250,17 +292,25 @@ function hideLoading() {
     typingInterval = null;
   }
   
-  // Hide loading, show question
-  elements.loadingContainer.style.display = 'none';
-  elements.questionContainer.style.display = 'block';
-  elements.loadingText.textContent = '';
+  // Hide loading, show question banner
+  if (elements.loadingContainer) {
+    elements.loadingContainer.style.display = 'none';
+  }
+  if (elements.questionBanner) {
+    elements.questionBanner.style.display = 'block';
+  }
+  if (elements.loadingText) {
+    elements.loadingText.textContent = '';
+  }
 }
 
 function typeText(text, duration) {
+  if (!elements.loadingText) return;
+  
   elements.loadingText.textContent = '';
   
   let currentIndex = 0;
-  const typingSpeed = duration / text.length; // Distribute typing over duration
+  const typingSpeed = duration / text.length;
   
   // Clear any existing interval
   if (typingInterval) {
@@ -275,7 +325,6 @@ function typeText(text, duration) {
       // Once done, add blinking cursor effect
       clearInterval(typingInterval);
       
-      // Optional: Add blinking cursor
       let cursorVisible = true;
       typingInterval = setInterval(() => {
         if (cursorVisible) {
@@ -293,25 +342,29 @@ function typeText(text, duration) {
 function toggleTTS() {
   ttsEnabled = !ttsEnabled;
   
-  if (ttsEnabled) {
-    elements.ttsToggle.textContent = 'Voice On';
-    if (currentQuestion?.tts?.enabled) {
-      elements.replayAudio.style.display = 'inline-block';
-    }
-  } else {
-    elements.ttsToggle.textContent = 'Voice Off';
-    elements.replayAudio.style.display = 'none';
-    
-    // Stop current audio
-    if (isPlaying) {
-      elements.ttsAudio.pause();
-      isPlaying = false;
+  if (elements.ttsToggle) {
+    if (ttsEnabled) {
+      elements.ttsToggle.textContent = '🔊 Voice On';
+      if (currentQuestion?.tts?.enabled && elements.replayAudio) {
+        elements.replayAudio.style.display = 'inline-block';
+      }
+    } else {
+      elements.ttsToggle.textContent = '🔇 Voice Off';
+      if (elements.replayAudio) {
+        elements.replayAudio.style.display = 'none';
+      }
+      
+      // Stop current audio
+      if (isPlaying && elements.ttsAudio) {
+        elements.ttsAudio.pause();
+        isPlaying = false;
+      }
     }
   }
 }
 
 function playAudio(audioUrl) {
-  if (!ttsEnabled) return;
+  if (!ttsEnabled || !elements.ttsAudio) return;
   
   const fullUrl = `${BACKEND_URL}${audioUrl}`;
   elements.ttsAudio.src = fullUrl;
@@ -319,7 +372,9 @@ function playAudio(audioUrl) {
   elements.ttsAudio.play()
     .then(() => {
       isPlaying = true;
-      elements.replayText.textContent = 'Playing...';
+      if (elements.replayText) {
+        elements.replayText.textContent = 'Playing...';
+      }
     })
     .catch(error => {
       console.error('Failed to play audio:', error);
@@ -329,7 +384,6 @@ function playAudio(audioUrl) {
 
 function replayAudio() {
   if (!currentQuestion?.tts?.audioUrl || isPlaying) return;
-  
   playAudio(currentQuestion.tts.audioUrl);
 }
 
@@ -344,21 +398,33 @@ function getUserId() {
 }
 
 function showError(message) {
-  elements.errorText.textContent = message;
-  elements.errorMessage.style.display = 'block';
+  if (elements.errorText) {
+    elements.errorText.textContent = message;
+  }
+  if (elements.errorMessage) {
+    elements.errorMessage.style.display = 'block';
+    
+    setTimeout(() => {
+      elements.errorMessage.style.display = 'none';
+    }, 5000);
+  }
   
-  setTimeout(() => {
-    elements.errorMessage.style.display = 'none';
-  }, 5000);
+  // Also show in bubbles if available
+  if (window.addBubble) {
+    window.addBubble('❌ ' + message, 'left');
+  }
 }
 
 function handleBack() {
-  // Navigate to previous question (if implemented)
   if (questionHistory.length > 0) {
     console.log('Previous questions:', questionHistory);
-    // Could implement going back here
   }
 }
 
 // ===== START APP =====
-document.addEventListener('DOMContentLoaded', init);
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
