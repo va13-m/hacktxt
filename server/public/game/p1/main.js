@@ -72,7 +72,7 @@ class MainScene extends Phaser.Scene
             0xFFFFFF, // White
             0xF5F5F5  // White Smoke (Off-white)
         ];
-        const carNames = ["Corolla", "Camry", "Prius", "Mirai", "Toyota Crown", "Supra"];
+        const carNames = ["Corolla", "Camry", "Prius", "Mirai", "RAV4", "Supra"];
 		const NUM_CARS = 6; 
 
         // 1. Create the invisible car sprites
