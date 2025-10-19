@@ -23,24 +23,49 @@ app.post("/api/login-debug", (req, res) => {
   return res.json({ ok: true, received: req.body });
 });
 
-function listRoutes() {
-  const routes: string[] = [];
-  // @ts-ignore
-  app._router.stack.forEach((m: any) => {
-    if (m.route && m.route.path) {
-      const methods = Object.keys(m.route.methods).join(',').toUpperCase();
-      routes.push(`${methods} ${m.route.path}`);
-    } else if (m.name === 'router' && m.handle && m.handle.stack) {
-      m.handle.stack.forEach((h: any) => {
-        if (h.route) {
-          const methods = Object.keys(h.route.methods).join(',').toUpperCase();
-          routes.push(`${methods} ${h.route.path}`);
-        }
-      });
+import type { Express } from "express";
+
+function listRoutes(app: Express) {
+  const rootStack: any[] = (app as any)?._router?.stack ?? [];
+  const lines: string[] = [];
+
+  const pushRoute = (methodsObj: Record<string, boolean> | undefined, path: string, prefix = "") => {
+    const methods = Object.keys(methodsObj ?? {}).map(m => m.toUpperCase()).join(",");
+    if (!methods || !path) return;
+    lines.push(`${methods} ${prefix}${path}`);
+  };
+
+  const walk = (stack: any[], prefix = "") => {
+    for (const layer of stack) {
+      // Direct route (app.get/post/etc.)
+      if (layer?.route?.path) {
+        pushRoute(layer.route.methods, layer.route.path, prefix);
+        continue;
+      }
+
+      // Nested router (app.use('/prefix', router))
+      const isRouter = layer?.name === "router" && Array.isArray(layer?.handle?.stack);
+      if (isRouter) {
+        // Best-effort prefix (Express doesn't always expose a clean string path here)
+        const subPrefix =
+          typeof layer?.path === "string" ? prefix + layer.path :
+          layer?.regexp?.fast_slash ? prefix + "/" : prefix;
+
+        walk(layer.handle.stack, subPrefix);
+      }
+      // Middlewares (no routes) are ignored
     }
-  });
-  console.log("REGISTERED ROUTES:\n" + routes.join("\n"));
+  };
+
+  if (!Array.isArray(rootStack)) {
+    console.warn("No router stack found (did you register routes before calling listRoutes?)");
+    return;
+  }
+
+  walk(rootStack);
+  console.log("REGISTERED ROUTES:\n" + (lines.length ? lines.join("\n") : "(none)"));
 }
+
 setTimeout(listRoutes, 500);
 // --- end DEBUG HELPERS ---
 
