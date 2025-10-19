@@ -155,7 +155,7 @@ async function handleSubmit() {
     if (data.complete) {
       // Journey complete - show final message then redirect
       setTimeout(() => {
-        window.location.href = '/race-results.html';
+        window.location.href = '/analyst/index.html';
       }, currentQuestion.loadingTransition?.duration || 3000);
     } else {
       // Show next question after loading
