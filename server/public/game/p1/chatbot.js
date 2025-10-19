@@ -110,7 +110,7 @@ async function startGame() {
     displayQuestion(data);
     
   } catch (error) {
-    console.error('❌ Error starting game:', error);
+    console.error('Error starting game:', error);
     showError('Failed to start game. Please refresh the page.');
   }
 }
@@ -184,7 +184,7 @@ async function handleSubmit() {
     }
     
   } catch (error) {
-    console.error('❌ Error submitting answer:', error);
+    console.error('Error submitting answer:', error);
     hideLoading();
     showError('Failed to submit answer. Please try again.');
     if (elements.submitButton) {
@@ -197,7 +197,7 @@ function displayQuestion(data) {
   const { question, progress } = data;
   currentQuestion = question;
 
-  console.log('📋 Displaying question:', question.id);
+  console.log('Displaying question:', question.id);
 
   // Update question banner
   if (elements.questionCategory) {
@@ -328,7 +328,7 @@ function typeText(text, duration) {
       let cursorVisible = true;
       typingInterval = setInterval(() => {
         if (cursorVisible) {
-          elements.loadingText.textContent = text + '▋';
+          elements.loadingText.textContent = text ;
         } else {
           elements.loadingText.textContent = text;
         }
@@ -344,12 +344,12 @@ function toggleTTS() {
   
   if (elements.ttsToggle) {
     if (ttsEnabled) {
-      elements.ttsToggle.textContent = '🔊 Voice On';
+      elements.ttsToggle.textContent = ' Voice On';
       if (currentQuestion?.tts?.enabled && elements.replayAudio) {
         elements.replayAudio.style.display = 'inline-block';
       }
     } else {
-      elements.ttsToggle.textContent = '🔇 Voice Off';
+      elements.ttsToggle.textContent = 'Voice Off';
       if (elements.replayAudio) {
         elements.replayAudio.style.display = 'none';
       }
@@ -411,7 +411,7 @@ function showError(message) {
   
   // Also show in bubbles if available
   if (window.addBubble) {
-    window.addBubble('❌ ' + message, 'left');
+    window.addBubble('X ' + message, 'left');
   }
 }
 
@@ -427,4 +427,21 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
+}
+
+function prioritizeToyotas(results) {
+  const priority = ["camry", "corolla", "rav4"];
+  const prioritySlots = new Array(priority.length).fill(null);
+  const others = [];
+
+  results.forEach((r) => {
+    const name = (r.name || r.model || "").toLowerCase();
+    const i = priority.findIndex(p => name.includes(p));
+    if (i !== -1 && !prioritySlots[i]) prioritySlots[i] = r;
+    else others.push(r);
+  });
+
+  const filledPriority = prioritySlots.filter(Boolean);
+  const shuffledOthers = others.sort(() => Math.random() - 0.5);
+  return [...filledPriority, ...shuffledOthers];
 }

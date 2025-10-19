@@ -86,7 +86,7 @@ const layerMini = document.querySelector('.diamond-mini-layer');
 const STAR_COUNT = 110;
 const SIZE_MIN = 2, SIZE_MAX = 5;
 const MINI_COUNT = 120;
-the MINI_SIZE_MIN = 1, MINI_SIZE_MAX = 2;
+const MINI_SIZE_MIN = 1, MINI_SIZE_MAX = 2;
 
 const TWINKLE_MIN = 2.0, TWINKLE_MAX = 6.0;
 const RELOCATE_EVERY_MIN = 4, RELOCATE_EVERY_MAX = 8;

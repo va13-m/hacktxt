@@ -72,7 +72,7 @@ class MainScene extends Phaser.Scene
             0xFFFFFF, // White
             0xF5F5F5  // White Smoke (Off-white)
         ];
-        const carNames = ["Corolla", "Camry", "Prius", "Mirai", "Toyota Crown", "Supra"];
+        const carNames = ["Corolla", "Camry", "Prius", "Mirai", "RAV4", "Supra"];
 		const NUM_CARS = 6; 
 
         // 1. Create the invisible car sprites
@@ -93,7 +93,7 @@ class MainScene extends Phaser.Scene
                 fontFamily: 'Arial Black', // Bolder font
                 fontSize: '80px', 
                 color: '#FFFFFF',
-                stroke: '#000000',
+                stroke: '#01020eff',
                 strokeThickness: 10 // Thicker stroke
             }).setOrigin(0.5).setVisible(false); // Centered origin, initially invisible
             this.carNameTexts.push(nameText);

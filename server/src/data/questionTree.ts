@@ -52,7 +52,7 @@ export const questionTree: Record<string, Question> = {
   // intro question to see where they are - NO LOADING (first question)
   start: {
     id: 'start',
-    text: "Let's find your perfect Toyota. What brings you here today?",
+    text: "Let's find your perfect car. What brings you here today?",
     subtext: "This helps us understand where you are in your journey",
     category: 'intro',
     placeholder: "Type your answer here...",
@@ -62,8 +62,8 @@ export const questionTree: Record<string, Question> = {
     ],
     tts: {
       enabled: true,
-      voicePrompt: "Let's find your perfect Toyota. What brings you here today?",
-      emphasis: ["perfect Toyota"],
+      voicePrompt: "Let's find your perfect car. What brings you here today?",
+      emphasis: ["perfect car"],
       pauseAfter: 500
     },
     next: (answer: string, userData: UserData) => {
@@ -522,7 +522,7 @@ export const questionTree: Record<string, Question> = {
   //toyota connection
   toyota_connection: {
     id: 'toyota_connection',
-    text: "Last question! Any Toyota models on your radar?",
+    text: "Last question! Any car models on your radar?",
     subtext: "We'll match you either way - just curious!",
     category: 'goals',
     placeholder: "Any favorites in mind?",
@@ -541,7 +541,7 @@ export const questionTree: Record<string, Question> = {
     },
     tts: {
       enabled: true,
-      voicePrompt: "Last question! Any Toyota models on your radar?",
+      voicePrompt: "Last question! Any car models on your radar?",
       emphasis: ["last question"],
       pauseAfter: 500
     },

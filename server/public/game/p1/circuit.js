@@ -1,6 +1,6 @@
 class Circuit
 {
-    constructor(scene){	
+    constructor(scene){	
 		// reference to the game scene
 		this.scene = scene;
 		
@@ -26,10 +26,10 @@ class Circuit
 		this.rumble_segments = 5;
 			
 		// number of road lanes
-		this.roadLanes = 6; 
+		this.roadLanes = 6;	
 		
 		// road width (actually half of the road)
-		this.roadWidth = 2200; 
+		this.roadWidth = 2200;	
 		
 		// total road length
 		this.roadLength = null;
@@ -81,8 +81,8 @@ class Circuit
 	createSegment(){
 		// define colors
 		const COLORS = {
-			LIGHT:	{road: '0x888888', grass: '0x429352', rumble: '0xb8312e'},
-			DARK:	{road: '0x666666', grass: '0x397d46', rumble: '0xDDDDDD', lane: '0xFFFFFF'}
+			LIGHT:	{road: '0x0d1b2a', grass: '0x429352', rumble: '0xd4af37'},
+			DARK:	{road: '0x0d1b2a', grass: '0x397d46', rumble: '0xd4af37', lane: '0xFFFFFF'}
 		};
 		
 		// get the current number of the segments
@@ -157,9 +157,9 @@ class Circuit
 			var currSegment = this.segments[currIndex];
 
 			// get the camera offset-Z to loop back the road
-            var offsetZ = (currIndex < baseIndex) ? this.roadLength : 0;
-            
-            // Project based on the camera's *looped* z
+            var offsetZ = (currIndex < baseIndex) ? this.roadLength : 0;
+            
+            // Project based on the camera's *looped* z
 			this.project3D(currSegment.point, camera.x, camera.y, camera.z-offsetZ, camera.distToPlane);
 			
 			// draw this segment only if it is above the clipping bottom line
@@ -188,11 +188,11 @@ class Circuit
 		
 		// draw all players
 		for(const player of this.scene.players){
-            // --- SPAM BUG FIX ---
-            // Only draw the sprite if the player update determined it should be visible
-            if (player.sprite.visible) {
-			    this.texture.draw(player.sprite, player.screen.x, player.screen.y);
-            }
+            // --- SPAM BUG FIX ---
+            // Only draw the sprite if the player update determined it should be visible
+            if (player.sprite.visible) {
+			    this.texture.draw(player.sprite, player.screen.x, player.screen.y);
+            }
 		}
 	}
 
@@ -207,9 +207,35 @@ this.graphics.fillRect(0, y2, SCREEN_W, y1 - y2);
 		// draw road
 		this.drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road);
 	
-		// draw rumble strips
+		// --- NEW: Draw Rumble Glow ---
 		var rumble_w1 = w1/5;
 		var rumble_w2 = w2/5;
+		var glow_w1 = rumble_w1 * 3; // Glow is 3x the width of the rumble strip
+		var glow_w2 = rumble_w2 * 3;
+		var glow_alpha = 0.3; // 30% opacity
+
+		// Left Glow (pointing into space) - drawn first so it's underneath
+		this.drawPolygon(
+			x1-w1-rumble_w1-glow_w1, y1, // top-left (outer)
+			x1-w1-rumble_w1, y1, 		 // top-right (inner)
+			x2-w2-rumble_w2, y2, 		 // bottom-right (inner)
+			x2-w2-rumble_w2-glow_w2, y2, // bottom-left (outer)
+			color.rumble, // Use the correct color here
+			glow_alpha
+		);
+		
+		// Right Glow (pointing into space) - drawn first so it's underneath
+		this.drawPolygon(
+			x1+w1+rumble_w1, y1, 		 // top-left (inner)
+			x1+w1+rumble_w1+glow_w1, y1, // top-right (outer)
+			x2+w2+rumble_w2+glow_w2, y2, // bottom-right (outer)
+			x2+w2+rumble_w2, y2, 		 // bottom-left (inner)
+			color.rumble, // Use the correct color here
+			glow_alpha
+		);
+		// --- End NEW ---
+
+		// draw rumble strips (now drawn ON TOP of the glow)
 		this.drawPolygon(x1-w1-rumble_w1, y1, x1-w1, y1, x2-w2, y2, x2-w2-rumble_w2, y2, color.rumble);
 		this.drawPolygon(x1+w1+rumble_w1, y1, x1+w1, y1, x2+w2, y2, x2+w2+rumble_w2, y2, color.rumble);
 		
@@ -241,9 +267,10 @@ this.graphics.fillRect(0, y2, SCREEN_W, y1 - y2);
 
 	/**
 	* Draws a polygon defined with four points and color.
+	* Added 'alpha' parameter for transparency.
 	*/	
-	drawPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color){
-		this.graphics.fillStyle(color, 1);
+	drawPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color, alpha = 1.0){ // Added alpha parameter
+		this.graphics.fillStyle(color, alpha); // Use alpha here
 		this.graphics.beginPath();
 		
 		this.graphics.moveTo(x1, y1);
