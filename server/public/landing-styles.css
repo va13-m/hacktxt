@@ -1,3 +1,10 @@
+/* Make the CTA reliably clickable above the border layer */
+.card-cta { position: relative; z-index: 3; pointer-events: auto; }
+/* Ensure the shiny border never blocks clicks */
+.gold-border-sparkle { pointer-events: none; }
+
+
+
 .content.dashboard-center {
   position: relative; z-index: 1;
   display: grid; place-items: center;
@@ -254,3 +261,100 @@ body.theme-light .shooting-layer {
       0 0 72px rgba(255, 232, 140, 0.70);
   }
 }
+
+/* ====== Game Instructions Modal ====== */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: none;
+}
+.modal-backdrop.open { display: block; }
+
+.modal {
+  position: fixed; inset: 0; z-index: 9999;
+  display: grid; place-items: center;
+  padding: 24px;
+  display: none;
+}
+.modal.open { display: grid; }
+
+.modal-card {
+  width: min(720px, 92vw);
+  border-radius: 20px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px) saturate(120%);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 0 0 1px var(--panel-border);
+  padding: 26px 22px 20px;
+  position: relative;
+}
+
+/* subtle shimmering border to match theme */
+.modal-card::before {
+  content: "";
+  position: absolute; inset: -6px;
+  border-radius: 26px;
+  padding: 6px;
+  background: linear-gradient(135deg, var(--gold-1), var(--gold-2), var(--gold-3), var(--gold-2), var(--gold-1));
+  background-size: 220% 220%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: borderFlow 5.2s linear infinite;
+  filter: drop-shadow(0 0 10px var(--gold-shadow-1));
+  pointer-events: none;
+}
+body.theme-light .modal-card::before {
+  background: linear-gradient(135deg, var(--blue-1), var(--blue-2), var(--blue-3), var(--blue-2), var(--blue-1));
+  background-size: 300% 300%;
+}
+
+.modal-title {
+  margin: 2px 0 10px;
+  font-family: "Cinzel Decorative", serif;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+  letter-spacing: .02em;
+  text-align: center;
+  color: var(--text);
+}
+
+.modal-body {
+  color: var(--subtext);
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.55;
+  display: grid; gap: 10px;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex; gap: 10px; justify-content: center;
+}
+
+.modal-btn {
+  border: 0; cursor: pointer;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-family: "Cinzel Decorative", serif;
+  font-weight: 700;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+  color: #0b0b0b;
+  box-shadow:
+    0 0 14px rgba(255, 241, 170, 0.65),
+    0 0 28px rgba(212, 175, 55, 0.55);   /* bright glow, not shadow */
+}
+body.theme-light .modal-btn.primary {
+  background: linear-gradient(135deg, var(--blue-1), var(--blue-2), var(--blue-3));
+  box-shadow:
+    0 0 14px rgba(150, 190, 255, 0.60),
+    0 0 28px rgba(120, 170, 255, 0.55);
+}
+
+.modal-btn.ghost {
+  background: rgba(255,255,255,0.10);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
