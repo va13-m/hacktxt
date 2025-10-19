@@ -1,0 +1,449 @@
+import fetch from 'node-fetch';
+
+
+//Documentation: http://api.nessieisreal.com/documentation
+export class NessieService {
+  private apiKey: string;
+  private baseURL: string;
+
+
+  constructor() {
+    this.apiKey = process.env.NESSIE_API_KEY || '';
+    this.baseURL = 'http://api.nessieisreal.com';
+   
+    if (!this.apiKey) {
+      console.warn('fix api key');
+    } else {
+      console.log('nessie API initialized');
+    }
+  }
+
+
+  //verify the api connection
+  async testConnection(): Promise<boolean> {
+    try {
+      const customers = await this.getAllCustomers();
+      return Array.isArray(customers);
+    } catch (error) {
+      console.error('Nessie API connection failed:', error);
+      return false;
+    }
+  }
+
+
+
+
+//GET /customers
+  async getAllCustomers(): Promise<any[]> {
+    const url = `${this.baseURL}/customers?key=${this.apiKey}`;
+   
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      throw error;
+    }
+  }
+
+
+
+
+//GET /customers/{id}
+  async getCustomer(customerId: string): Promise<any> {
+    const url = `${this.baseURL}/customers/${customerId}?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get customer: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+
+
+   //GET /customers/{id}/accounts
+  async getCustomerAccounts(customerId: string): Promise<any[]> {
+    const url = `${this.baseURL}/customers/${customerId}/accounts?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get accounts: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+
+
+//GET /accounts
+  async getAllAccounts(): Promise<any[]> {
+    const url = `${this.baseURL}/accounts?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get accounts: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+//GET /accounts/{id}
+  async getAccount(accountId: string): Promise<any> {
+    const url = `${this.baseURL}/accounts/${accountId}?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get account: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+
+
+   //POST /customers/{id}/accounts
+  async createAccount(
+    customerId: string,
+    type: 'Checking' | 'Savings' | 'Credit Card',
+    nickname: string,
+    rewards: number,
+    balance: number
+  ): Promise<any> {
+    const url = `${this.baseURL}/customers/${customerId}/accounts?key=${this.apiKey}`;
+   
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type,
+        nickname,
+        rewards,
+        balance
+      })
+    });
+
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to create account: ${errorText}`);
+    }
+   
+    const data = await response.json();
+    return data.objectCreated || data;
+  }
+
+
+
+
+   //PUT /accounts/{id}
+  async updateAccount(
+    accountId: string,
+    nickname?: string,
+    balance?: number
+  ): Promise<any> {
+    const url = `${this.baseURL}/accounts/${accountId}?key=${this.apiKey}`;
+   
+    const updateData: any = {};
+    if (nickname) updateData.nickname = nickname;
+    if (balance !== undefined) updateData.balance = balance;
+   
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updateData)
+    });
+
+
+    if (!response.ok) {
+      throw new Error(`Failed to update account: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+   //GET /accounts/{id}/purchases
+  async getAccountPurchases(accountId: string): Promise<any[]> {
+    const url = `${this.baseURL}/accounts/${accountId}/purchases?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get purchases: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+
+
+   //POST /accounts/{id}/purchases
+  async createPurchase(
+    accountId: string,
+    merchantId: string,
+    medium: 'balance' | 'rewards',
+    purchaseDate: string,
+    amount: number,
+    description?: string
+  ): Promise<any> {
+    const url = `${this.baseURL}/accounts/${accountId}/purchases?key=${this.apiKey}`;
+   
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        merchant_id: merchantId,
+        medium,
+        purchase_date: purchaseDate,
+        amount,
+        status: 'pending',
+        description
+      })
+    });
+
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to create purchase: ${errorText}`);
+    }
+   
+    const data = await response.json();
+    return data.objectCreated || data;
+  }
+
+
+   //GET /purchases/{id}
+  async getPurchase(purchaseId: string): Promise<any> {
+    const url = `${this.baseURL}/purchases/${purchaseId}?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get purchase: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+
+
+
+
+// GET /merchants
+  async getAllMerchants(): Promise<any[]> {
+    const url = `${this.baseURL}/merchants?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get merchants: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+   //GET /merchants/{id}
+  async getMerchant(merchantId: string): Promise<any> {
+    const url = `${this.baseURL}/merchants/${merchantId}?key=${this.apiKey}`;
+   
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to get merchant: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
+
+
+
+
+
+// simulate down payment for a car purchase
+  async simulateDownPayment(
+    accountId: string,
+    downPaymentAmount: number,
+    vehicleName: string
+  ): Promise<{ purchase: any; newBalance: number }> {
+   
+    //get a merchant (using first available merchant as Toyota dealer)
+    const merchants = await this.getAllMerchants();
+    const merchantId = merchants[0]?._id || '57cf75cea73e494d8675ec49';
+   
+    //create purchase transaction
+    const purchase = await this.createPurchase(
+      accountId,
+      merchantId,
+      'balance',
+      new Date().toISOString().split('T')[0],
+      downPaymentAmount,
+      `Down payment for ${vehicleName}`
+    );
+   
+    //get updated balance
+    const account = await this.getAccount(accountId);
+   
+    return {
+      purchase,
+      newBalance: account.balance
+    };
+  }
+
+
+
+
+   //simulate monthly car payment
+  async simulateMonthlyPayment(
+    accountId: string,
+    monthlyPayment: number,
+    paymentNumber: number,
+    vehicleName: string
+  ): Promise<{ purchase: any; newBalance: number }> {
+   
+    const merchants = await this.getAllMerchants();
+    const merchantId = merchants[0]?._id || '57cf75cea73e494d8675ec4a';
+   
+    const purchase = await this.createPurchase(
+      accountId,
+      merchantId,
+      'balance',
+      new Date().toISOString().split('T')[0],
+      monthlyPayment,
+      `${vehicleName} - Payment #${paymentNumber}`
+    );
+   
+    const account = await this.getAccount(accountId);
+   
+    return {
+      purchase,
+      newBalance: account.balance
+    };
+  }
+
+
+   //simulate multiple monthly payments
+  async simulatePaymentSchedule(
+    accountId: string,
+    monthlyPayment: number,
+    numberOfPayments: number,
+    vehicleName: string
+  ): Promise<{
+    payments: any[];
+    finalBalance: number;
+    totalPaid: number;
+  }> {
+   
+    const payments: any[] = [];
+    let totalPaid = 0;
+   
+    //limit to 12 payments for demo (avoid rate limiting)
+    const paymentsToSimulate = Math.min(numberOfPayments, 12);
+   
+    for (let i = 1; i <= paymentsToSimulate; i++) {
+      try {
+        const result = await this.simulateMonthlyPayment(
+          accountId,
+          monthlyPayment,
+          i,
+          vehicleName
+        );
+       
+        payments.push(result.purchase);
+        totalPaid += monthlyPayment;
+       
+        //small delay to avoid rate limiting
+        await this.sleep(300);
+       
+      } catch (error) {
+        console.error(`Failed to simulate payment ${i}:`, error);
+        break;
+      }
+    }
+   
+    //get final balance
+    const account = await this.getAccount(accountId);
+   
+    return {
+      payments,
+      finalBalance: account.balance,
+      totalPaid
+    };
+  }
+
+
+   //get or create a demo account for user
+  async getOrCreateDemoAccount(userId: string): Promise<any> {
+    try {
+      //try to find existing customers
+      const customers = await this.getAllCustomers();
+      if (customers.length > 0) {
+        //use first customer
+        const customer = customers[0];
+        const accounts = await this.getCustomerAccounts(customer._id);
+        if (accounts.length > 0) {
+          return accounts[0]; //return first account
+        } else {
+          //create account for existing customer
+          return await this.createAccount(
+            customer._id,
+            'Checking',
+            'Car Purchase Account',
+            0,
+            25000 // Starting balance
+          );
+        }
+      } else {
+        console.warn('No customers available in Nessie API');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error getting/creating demo account:', error);
+      throw error;
+    }
+  }
+
+
+
+
+   //helper: sleep function for rate limiting
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+
+    //format currency for display
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  }
+
+
+
+
+   //get transaction summary
+  async getTransactionSummary(accountId: string): Promise<{
+    totalSpent: number;
+    transactionCount: number;
+    averageTransaction: number;
+    currentBalance: number;
+  }> {
+    const purchases = await this.getAccountPurchases(accountId);
+    const account = await this.getAccount(accountId);
+   
+    const totalSpent = purchases.reduce((sum, p) => sum + p.amount, 0);
+    const transactionCount = purchases.length;
+    const averageTransaction = transactionCount > 0 ? totalSpent / transactionCount : 0;
+   
+    return {
+      totalSpent,
+      transactionCount,
+      averageTransaction,
+      currentBalance: account.balance
+    };
+  }
+}
+
+
+export default NessieService;
