@@ -1,0 +1,113 @@
+node_modules/
+server/node_modules/
+client/node_modules/
+
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+server/.env
+client/.env
+
+dist/
+build/
+server/dist/
+client/build/
+*.tsbuildinfo
+
+server/audio_cache/*.mp3
+!server/audio_cache/.gitkeep
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# ===== OPERATING SYSTEM FILES =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ===== IDE / EDITOR =====
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ===== DATABASE =====
+*.db
+*.sqlite
+*.sqlite3
+database.db
+server/database.db
+
+# ===== TESTING =====
+coverage/
+.nyc_output/
+*.lcov
+
+# ===== TYPESCRIPT =====
+*.tsbuildinfo
+
+# ===== PACKAGE MANAGER =====
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===== TEMPORARY FILES =====
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ===== MISC =====
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vercel
+.netlify
+
+# ===== SENSITIVE DATA =====
+# API Keys (if accidentally in code)
+*secret*
+*apikey*
+*api-key*
+
+# But allow files with 'secret' in their path if needed
+!server/src/**/
