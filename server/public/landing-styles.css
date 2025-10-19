@@ -1,0 +1,256 @@
+.content.dashboard-center {
+  position: relative; z-index: 1;
+  display: grid; place-items: center;
+  width: 100vw; min-height: 100vh;
+  padding: 32px;
+  overflow: auto;
+}
+
+.dashboard-card {
+  position: relative;
+  width: min(1100px, 94vw);
+  padding: 30px;
+  border-radius: 20px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(10px) saturate(120%);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), inset 0 0 0 1px var(--panel-border);
+}
+
+/* Split top */
+.hero-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+  margin-top: 12px;
+}
+
+/* Profile side */
+.profile-pane {
+  padding: 22px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.035);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+.avatar {
+  width: 72px; height: 72px; border-radius: 14px;
+  display: grid; place-items: center;
+  font-size: 32px; font-weight: 700;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+  color: #0b0b0b;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+}
+.profile-name { margin: 0; font-size: 1.35rem; color: var(--text); }
+.profile-meta { margin: 0; color: var(--subtext); opacity: 0.95; }
+.profile-stats {
+  display: flex; gap: 14px; margin-top: 6px;
+  width: 100%; justify-content: space-between;
+}
+.stat-num { display: block; font-weight: 700; font-size: 1.05rem; color: var(--gold-2); }
+.stat-label { display: block; font-size: 0.78rem; color: var(--subtext); }
+
+/* Right CTA */
+.card-cta {
+  display: block;
+  text-align: left;
+  padding: 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.06), rgba(212,175,55,0.03));
+  border: 1px solid rgba(212,175,55,0.12);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .25s ease;
+  width: 100%;
+}
+.card-cta:hover { transform: translateY(-4px); box-shadow: 0 18px 48px rgba(0,0,0,0.45); }
+.card-cta:active { transform: translateY(-1px); }
+.cta-inner h3 { margin: 0 0 6px; font-size: 1.25rem; color: var(--text); }
+.cta-inner p { margin: 0 0 12px; color: var(--subtext); font-size: .95rem; }
+.cta-actions { display: flex; gap: 10px; align-items: center; }
+.cta-pill {
+  padding: 6px 10px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+  color: #0b0b0b; font-weight: 700; font-size: 0.9rem;
+}
+
+/* Garage */
+.garage { margin-top: 22px; }
+.garage h3 { margin: 8px 0 12px; font-size: 1.1rem; color: var(--text); }
+.garage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.car-card {
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.03);
+  display: flex; flex-direction: column;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.car-card:hover { transform: translateY(-3px); }
+.car-card img { width: 100%; height: 140px; object-fit: cover; display: block; }
+.car-info { padding: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.car-info strong { display: block; font-size: 0.98rem; color: var(--text); }
+.car-info span { display: block; font-size: 0.82rem; color: var(--subtext); }
+.small-btn {
+  border: 0; padding: 8px 10px; border-radius: 10px;
+  background: rgba(255,255,255,0.09); color: var(--text); cursor: pointer;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+  .hero-split { grid-template-columns: 1fr; }
+}
+
+/* Keep stars visible on the landing page even in light mode */
+body.theme-light .diamond-layer,
+body.theme-light .diamond-mini-layer,
+body.theme-light .shooting-layer {
+  display: block !important;
+}
+
+/* --- CTA (“Looking for a new car?”) font & style tweaks --- */
+.card-cta .cta-inner h3 {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.35),
+               0 0 12px rgba(212, 175, 55, 0.25);
+}
+
+.card-cta .cta-inner p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  color: var(--subtext);
+  opacity: 0.9;
+}
+
+
+.cta-pill {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* --- CTA typography: use Cinzel Decorative everywhere in the card --- */
+.card-cta .cta-inner,
+.card-cta .cta-inner h3,
+.card-cta .cta-inner p,
+.card-cta .cta-pill {
+  font-family: 'Cinzel Decorative', serif !important;
+}
+
+/* --- Headline spacing/kerning fix --- */
+.card-cta .cta-inner h3 {
+  margin: 0 0 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;   /* tighter than before to avoid the “L OOKING” look */
+  word-spacing: 0.02em;
+  line-height: 1.15;
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.35),
+    0 0 12px rgba(212,175,55,0.25);
+}
+
+/* --- Paragraph matches the headline font, a touch smaller --- */
+.card-cta .cta-inner p {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  opacity: 0.95;
+}
+
+/* --- Start the game pill in Cinzel with subtle tracking --- */
+.card-cta .cta-pill {
+  padding: 8px 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* Ensure car images fit perfectly inside garage cards */
+.garage-grid .car-card img {
+  width: 100%;
+  height: 250px;          /* Match the intended height */
+  object-fit: contain;    /* Keeps full image visible without cropping */
+  object-position: center;
+  background: transparent;
+         /* Adds breathing room */
+}
+
+
+/* === Center the CTA + add a bright glow to the pill === */
+
+/* center everything inside the right card */
+.card-cta .cta-inner {
+  display: grid;
+  gap: 12px;
+  justify-items: center;     /* horizontal center */
+  text-align: center;        /* overrides the parent’s text-align:left */
+}
+
+/* center the row that holds the pill */
+.card-cta .cta-actions {
+  justify-content: center;
+}
+
+/* glowing “Start the game” button */
+.card-cta .cta-pill {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+  color: #0b0b0b;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+
+  /* BRIGHT glow (not a drop shadow) */
+  box-shadow:
+    0 0 0 2px rgba(255, 247, 200, 0.35) inset,  /* soft inner rim */
+    0 0 14px rgba(255, 242, 170, 0.95),         /* primary glow */
+    0 0 28px rgba(255, 236, 140, 0.70),
+    0 0 44px rgba(255, 226, 120, 0.55);
+  filter: saturate(80%);
+  transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
+  animation: ctaGlowPulse 2.6s ease-in-out infinite;
+}
+
+/* hover: a touch brighter + tiny lift */
+.card-cta:hover .cta-pill {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 2px rgba(255, 247, 200, 0.45) inset,
+    0 0 18px rgba(255, 246, 190, 1),
+    0 0 34px rgba(255, 238, 150, 0.85),
+    0 0 60px rgba(255, 230, 130, 0.65);
+}
+
+/* subtle breathing glow */
+@keyframes ctaGlowPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px rgba(255, 247, 200, 0.35) inset,
+      0 0 14px rgba(255, 242, 170, 0.95),
+      0 0 28px rgba(255, 236, 140, 0.70),
+      0 0 44px rgba(255, 226, 120, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(255, 247, 200, 0.45) inset,
+      0 0 20px rgba(255, 248, 200, 1),
+      0 0 40px rgba(255, 240, 170, 0.85),
+      0 0 72px rgba(255, 232, 140, 0.70);
+  }
+}

@@ -148,7 +148,7 @@ loginForm?.addEventListener('submit', (e) => {
 
       setStatus("Login successful! Redirecting…", true);
       // send them to your game/home page served from server/public
-      setTimeout(() => (window.location.href = "game/p1/index.html"), 800);
+      setTimeout(() => { window.location.href = "/landing"; }, 600);
     })
     .catch(err => setStatus(err.message || "Could not connect to server"));
 });

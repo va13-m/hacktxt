@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Toyota Landing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/landing-styles.css" />
+</head>
+<body>
+  <div class="animated-bg" aria-hidden="true"></div>
+  <div class="space-vignette" aria-hidden="true"></div>
+  <div class="diamond-layer" aria-hidden="true"></div>
+  <div class="diamond-mini-layer" aria-hidden="true"></div>
+  <div class="shooting-layer" aria-hidden="true"></div>
+
+  <!-- Top-right controls -->
+  <div class="topbar">
+    <!-- Theme toggle (custom SVG icons) -->
+    <button id="themeToggle"
+            class="theme-toggle"
+            type="button"
+            aria-pressed="false"
+            aria-label="Toggle light or dark theme">
+      <!-- Sun (shown in dark mode) -->
+      <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="5.5" fill="#FFD54F"></circle>
+        <g stroke="#FFD54F" stroke-width="1.8" stroke-linecap="round">
+          <line x1="12" y1="1.5" x2="12" y2="4.2"></line>
+          <line x1="12" y1="19.8" x2="12" y2="22.5"></line>
+          <line x1="1.5" y1="12" x2="4.2" y2="12"></line>
+          <line x1="19.8" y1="12" x2="22.5" y2="12"></line>
+          <line x1="4.1" y1="4.1" x2="6.0" y2="6.0"></line>
+          <line x1="18.0" y1="18.0" x2="19.9" y2="19.9"></line>
+          <line x1="18.0" y1="6.0" x2="19.9" y2="4.1"></line>
+          <line x1="4.1" y1="19.9" x2="6.0" y2="18.0"></line>
+        </g>
+      </svg>
+
+      <!-- Moon (shown in light mode) -->
+      <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <defs>
+          <mask id="crescent-cut">
+            <rect width="24" height="24" fill="#fff"></rect>
+            <circle cx="15" cy="9" r="9" fill="#000"></circle>
+          </mask>
+        </defs>
+        <circle cx="12" cy="12" r="10" fill="#111" mask="url(#crescent-cut)"></circle>
+      </svg>
+
+      <span class="visually-hidden">Toggle theme</span>
+    </button>
+  </div>
+
+
+  <main class="content dashboard-center">
+    <section class="dashboard-card" aria-labelledby="dashTitle">
+      <div class="gold-border-sparkle" aria-hidden="true"></div>
+      <h1 id="dashTitle" class="login-title">Welcome, Driver</h1>
+
+      <div class="hero-split">
+        <div class="profile-pane">
+          <div class="avatar" aria-hidden="true">A</div>
+          <h2 class="profile-name">Abha M.</h2>
+          <p class="profile-meta">Toyota Enthusiast</p>
+          <div class="profile-stats">
+            <div><span class="stat-num">3</span><span class="stat-label">Saved Cars</span></div>
+            <div><span class="stat-num">12</span><span class="stat-label">Viewed</span></div>
+            <div><span class="stat-num">98%</span><span class="stat-label">Match</span></div>
+          </div>
+          <button class="btn btn-ghost">Edit Profile</button>
+        </div>
+
+        <button id="findCar" class="card-cta" title="Find a new car">
+          <div class="cta-inner">
+            <h3>Looking for a new car?</h3>
+            <p>Play the Toyota Matchmaker to discover your best fit.</p>
+            <div class="cta-actions">
+              <span class="cta-pill">Start the game</span>
+              
+            </div>
+          </div>
+        </button>
+      </div>
+
+      <div class="garage">
+        <h3>Your Garage</h3>
+        <div class="garage-grid">
+          <article class="car-card">
+            <img src="/assets/cars/corolla-2024-le-icecap.png" alt="2024 Toyota Corolla LE Icecap" />
+            <div class="car-info">
+              <strong>Toyota Corolla</strong>
+              <span>2024 • LE • Icecap</span>
+              <button class="small-btn">View</button>
+            </div>
+          </article>
+          <article class="car-card">
+            <img src="/assets/cars/rav4-2023-xle-magnetic-gray.png" alt="2023 Toyota RAV4 XLE Magnetic Gray" />
+            <div class="car-info">
+              <strong>Toyota RAV4</strong>
+              <span>2023 • XLE • Magnetic Gray</span>
+              <button class="small-btn">View</button>
+            </div>
+          </article>
+          <article class="car-card">
+            <img src="/assets/cars/camry.png" alt="Toyota Camry" />
+            <div class="car-info">
+              <strong>Toyota Camry</strong>
+              <span>2022 • SE • Super White</span>
+              <button class="small-btn">View</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/signup.js"></script>
+  <script>
+    document.getElementById("findCar")?.addEventListener("click", () => {
+      window.location.href = "/game/p1/index.html";
+    });
+  </script>
+</body>
+</html>

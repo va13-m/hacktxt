@@ -70,6 +70,23 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 const port = Number(process.env.PORT || 5174);
 app.listen(port, () => console.log(`API on http://localhost:${port}`));
 
+// Root goes to signup
 app.get("/", (_req, res) => {
   res.sendFile(path.join(publicDir, "signup.html"));
 });
+
+// Pretty route for signup if you want it explicit
+app.get("/signup", (_req, res) => {
+  res.sendFile(path.join(publicDir, "signup.html"));
+});
+
+// Landing route
+app.get("/landing", (_req, res) => {
+  res.sendFile(path.join(publicDir, "landing.html"));
+});
+
+// Game route
+app.get("/game", (_req, res) => {
+  res.redirect("/game/p1/index.html");
+});
+
