@@ -49,8 +49,8 @@ class Player
 		this.screen.h = this.sprite.height;
 				
 		// set the player screen position (will be overwritten by projection)
-		this.screen.x = 0;
-		this.screen.y = 0;
+	this.screen.x = SCREEN_CX;
+this.screen.y = SCREEN_H - this.screen.h/2;
 	}
 	
 	/**

@@ -1,24 +1,132 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		
-		<meta name="application-name" content="Pseudo-3D Racer" />
-		<meta name="author" content="AskForGameTask" />
-		<meta name="description" content="A pseudo 3D racing game prototype." />
-		<meta name.keywords content="outrun, racer, racing, pseudo-3d, game, prototype" />
-		<meta name="copyright" content="2021 Ask For Game Task" />
-			
-		<title>Pseudo-3D Racer</title>
-		<style>body {margin: 0; background: #000; overflow: hidden}</style>
-		<script src = "..\libs\phaser.min.js"></script>
-		<script src = "main.js"></script>
-		<script src = "settings.js"></script>
-		<script src = "circuit.js"></script>
-		<script src = "player.js"></script>
-		<script src = "camera.js"></script>
-	</head>
-	<body>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="application-name" content="Pseudo-3D Racer" />
+    <meta name="author" content="AskForGameTask" />
+    <meta name="description" content="A pseudo 3D racing game prototype." />
+    <meta name="keywords" content="outrun, racer, racing, pseudo-3d, game, prototype" />
+    <meta name="copyright" content="2021 Ask For Game Task" />
+    <title>Pseudo-3D Racer</title>
+
+    <style>
+      body { margin: 0; overflow: hidden; }
+
+      /* Background gradient */
+      .animated-bg {
+        position: fixed; inset: 0;
+        z-index: 0;
+        background: linear-gradient(135deg,
+          #030616, #0a0f3c, #0d1b2a, #13223f,
+          #1b2a4a, #243b6b, #0e2a47, #030616);
+        background-size: 600% 600%;
+        animation: gradientShift 45s ease-in-out infinite;
+      }
+
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      /* Star layers */
+      .diamond-layer, .diamond-mini-layer {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1; /* ✅ Below the game, above gradient */
+        overflow: hidden;
+      }
+
+      /* Star styles */
+      .diamond,
+      .diamond-mini {
+        position: absolute;
+        transform: translate(-50%,-50%) rotate(45deg) scale(1);
+        border-radius: 2px;
+        background: linear-gradient(145deg, rgba(255,255,224,0.95), rgba(255,255,255,0.85));
+        opacity: 0.85;
+        animation: diamondTwinkle var(--twinkle, 6s) ease-in-out infinite;
+        will-change: transform, opacity;
+      }
+
+      .diamond {
+        width: var(--size, 4px);
+        height: var(--size, 4px);
+        box-shadow: 0 0 8px rgba(255,255,224,0.38),
+                    0 0 16px rgba(255,255,180,0.25);
+      }
+
+      .diamond-mini {
+        width: var(--size, 2px);
+        height: var(--size, 2px);
+        box-shadow: 0 0 6px rgba(255,255,224,0.28),
+                    0 0 12px rgba(255,255,180,0.18);
+      }
+
+      @keyframes diamondTwinkle {
+        0%   { transform: translate(-50%,-50%) rotate(45deg) scale(0.82); opacity: 0.15; }
+        25%  { transform: translate(-50%,-50%) rotate(45deg) scale(1.04); opacity: 0.78; }
+        50%  { transform: translate(-50%,-50%) rotate(45deg) scale(0.95); opacity: 0.50; }
+        75%  { transform: translate(-50%,-50%) rotate(45deg) scale(1.10); opacity: 0.90; }
+        100% { transform: translate(-50%,-50%) rotate(45deg) scale(0.82); opacity: 0.18; }
+      }
+
+      /* Make sure Phaser is on top */
+      canvas {
+        position: relative;
+        z-index: 5;
+        display: block;
+      }
+    </style>
+
+    <!-- Phaser and game scripts -->
+    <script src="../libs/phaser.min.js"></script>
+    <script src="settings.js"></script>
+    <script src="circuit.js"></script>
+    <script src="player.js"></script>
+    <script src="camera.js"></script>
+    <script src="main.js"></script>
+  </head>
+
+  <body>
+    <!-- Background gradient -->
+    <div class="animated-bg"></div>
+
+    <!-- Star layers -->
+    <div class="diamond-layer"></div>
+    <div class="diamond-mini-layer"></div>
+
+    <!-- Script to spawn stars -->
+    <script>
+      const starCount = 75;      // Large stars
+      const miniStarCount = 150; // Smaller stars
+
+      const layer = document.querySelector('.diamond-layer');
+      const miniLayer = document.querySelector('.diamond-mini-layer');
+
+      // Create big stars
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'diamond';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--size', (Math.random() * 3 + 2) + 'px');
+        star.style.setProperty('--twinkle', (Math.random() * 4 + 4) + 's');
+        layer.appendChild(star);
+      }
+
+      // Create mini stars
+      for (let i = 0; i < miniStarCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'diamond-mini';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--size', (Math.random() * 2 + 1) + 'px');
+        star.style.setProperty('--twinkle', (Math.random() * 5 + 3) + 's');
+        miniLayer.appendChild(star);
+      }
+    </script>
+  </body>
 </html>
