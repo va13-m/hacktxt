@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toyota Cosmic Advisor</title>
+</head>
+<body>
+
+  <!-- TTS Toggle -->
+  <button id="ttsToggle">Voice On</button>
+
+  <!-- Loading Container (Typing Animation) -->
+  <div id="loadingContainer" style="display: none;">
+    <p id="loadingText"></p>
+  </div>
+
+  <!-- Question Container -->
+  <div id="questionContainer">
+    
+    <!-- Question Header -->
+    <div id="questionHeader">
+      <span id="questionCategory"></span>
+    </div>
+
+    <!-- Question Text -->
+    <h2 id="questionText"></h2>
+
+    <!-- Subtext -->
+    <p id="questionSubtext"></p>
+
+    <!-- Replay Audio Button -->
+    <button id="replayAudio" style="display: none;">
+      <span id="replayText">Replay question</span>
+    </button>
+
+    <!-- Answer Input -->
+    <div id="answerSection">
+      <textarea 
+        id="answerInput" 
+        placeholder="Type your answer here..."
+        rows="4"
+      ></textarea>
+
+      <!-- Examples -->
+      <div id="examplesContainer" style="display: none;">
+        <p>Examples:</p>
+        <div id="examplesList"></div>
+      </div>
+
+      <!-- Tooltip -->
+      <div id="tooltip" style="display: none;">
+        <span id="tooltipText"></span>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button id="submitButton">Continue →</button>
+
+    <!-- Back Button -->
+    <button id="backButton" style="display: none;">← Back</button>
+  </div>
+
+  <!-- Error Message -->
+  <div id="errorMessage" style="display: none;">
+    <span id="errorText"></span>
+  </div>
+
+  <!-- Hidden Audio Element -->
+  <audio id="ttsAudio"></audio>
+
+  <script src="chatbot.js"></script>
+</body>
+</html>

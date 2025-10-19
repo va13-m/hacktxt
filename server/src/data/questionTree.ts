@@ -41,7 +41,6 @@ export const CELESTIAL_MESSAGES = {
   ]
 };
 
-// ✅ Helper function to get random messages
 function getRandomMessages(category: keyof typeof CELESTIAL_MESSAGES, count: number = 3): string[] {
   const messages = CELESTIAL_MESSAGES[category];
   const shuffled = [...messages].sort(() => 0.5 - Math.random());
