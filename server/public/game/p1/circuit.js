@@ -26,10 +26,10 @@ class Circuit
 		this.rumble_segments = 5;
 			
 		// number of road lanes
-		this.roadLanes = 3;
+		this.roadLanes = 6; 
 		
 		// road width (actually half of the road)
-		this.roadWidth = 1000;
+		this.roadWidth = 2200; 
 		
 		// total road length
 		this.roadLength = null;
@@ -157,9 +157,9 @@ class Circuit
 			var currSegment = this.segments[currIndex];
 
 			// get the camera offset-Z to loop back the road
-			var offsetZ = (currIndex < baseIndex) ? this.roadLength : 0;
-			
-			// project the segment to the screen space
+            var offsetZ = (currIndex < baseIndex) ? this.roadLength : 0;
+            
+            // Project based on the camera's *looped* z
 			this.project3D(currSegment.point, camera.x, camera.y, camera.z-offsetZ, camera.distToPlane);
 			
 			// draw this segment only if it is above the clipping bottom line
@@ -186,9 +186,14 @@ class Circuit
 		// draw all the visible objects on the rendering texture
 		this.texture.clear();
 		
-		// draw player
-		var player = this.scene.player;
-		this.texture.draw(player.sprite, player.screen.x, player.screen.y);
+		// draw all players
+		for(const player of this.scene.players){
+            // --- SPAM BUG FIX ---
+            // Only draw the sprite if the player update determined it should be visible
+            if (player.sprite.visible) {
+			    this.texture.draw(player.sprite, player.screen.x, player.screen.y);
+            }
+		}
 	}
 
 	/**
