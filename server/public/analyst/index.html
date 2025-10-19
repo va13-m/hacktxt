@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Matchmaker Analyst</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Global theme/variables + stars (re-use your landing globals) -->
+    <link rel="stylesheet" href="/styles.css" />
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="./analyst.css" />
+</head>
+
+<body>
+    <!-- background layers (optional, same as landing) -->
+    <!-- Animated background + stars -->
+    <div class="animated-bg" aria-hidden="true"></div>
+    <div class="space-vignette" aria-hidden="true"></div>
+    <div class="diamond-layer" aria-hidden="true"></div>
+    <div class="diamond-mini-layer" aria-hidden="true"></div>
+    <div class="shooting-layer" aria-hidden="true"></div>
+
+    <!-- Top-right theme toggle -->
+    <div class="topbar">
+        <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Toggle theme">
+            <!-- Sun (shown in dark) -->
+            <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="5.5" fill="#FFD54F"></circle>
+                <g stroke="#FFD54F" stroke-width="1.8" stroke-linecap="round">
+                    <line x1="12" y1="1.5" x2="12" y2="4.2"></line>
+                    <line x1="12" y1="19.8" x2="12" y2="22.5"></line>
+                    <line x1="1.5" y1="12" x2="4.2" y2="12"></line>
+                    <line x1="19.8" y1="12" x2="22.5" y2="12"></line>
+                    <line x1="4.1" y1="4.1" x2="6.0" y2="6.0"></line>
+                    <line x1="18.0" y1="18.0" x2="19.9" y2="19.9"></line>
+                    <line x1="18.0" y1="6.0" x2="19.9" y2="4.1"></line>
+                    <line x1="4.1" y1="19.9" x2="6.0" y2="18.0"></line>
+                </g>
+            </svg>
+            <!-- Moon (shown in light) -->
+            <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                <defs>
+                    <mask id="crescent-cut">
+                        <rect width="24" height="24" fill="#fff" />
+                        <circle cx="15" cy="9" r="9" fill="#000" />
+                    </mask>
+                </defs>
+                <circle cx="12" cy="12" r="10" fill="#111" mask="url(#crescent-cut)"></circle>
+            </svg>
+            <span class="visually-hidden">Toggle theme</span>
+        </button>
+    </div>
+
+
+    <main class="analyst-shell">
+        <div class="analyst-wrap">
+            <h1 class="analyst-title">Your Matchmaker Results</h1>
+
+            <div class="cards-grid">
+                <!-- User profile & answers -->
+                <section class="a-card">
+                    <h2 class="a-title">User Profile &amp; Answers</h2>
+                    <div id="userSummary" class="a-body"></div>
+                </section>
+
+                <!-- Match results -->
+                <section class="a-card">
+                    <h2 class="a-title">Match Results</h2>
+                    <div id="matchResults" class="a-body"></div>
+                </section>
+
+                <!-- Payment simulation -->
+                <section class="a-card">
+                    <h2 class="a-title">Payment Simulation</h2>
+                    <div id="priceBlock" class="a-body"></div>
+
+                    <div class="pay-grid">
+                        <div class="pay-card">
+                            <h3>Finance (60 mo · 4.5% APR)</h3>
+                            <div id="financeBlock"></div>
+                        </div>
+                        <div class="pay-card">
+                            <h3>Lease (36 mo · 4.0% APR)</h3>
+                            <div id="leaseBlock"></div>
+                        </div>
+                    </div>
+
+                    <p id="recNote" class="rec-note"></p>
+                    <div class="actions">
+                        <button id="whatIfA" class="btn-nav">Simulate: Credit 750</button>
+                        <button id="whatIfB" class="btn-nav">Simulate: $0 Down</button>
+                        <button id="whatIfC" class="btn-nav">Compare Camry vs Corolla TCO</button>
+                    </div>
+                </section>
+
+                <!-- Smart tips -->
+                <section class="a-card">
+                    <h2 class="a-title">Smart Tips</h2>
+                    <ul id="tipsList" class="tips"></ul>
+                    <div class="footer-actions">
+                        <a class="btn-nav" href="/index.html">Save Results to Profile</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script src="./analyst.js" defer></script>
+
+    <script>
+        // ===== Theme (persisted) =====
+        const themeToggle = document.getElementById('themeToggle');
+        (function initTheme() {
+            const stored = localStorage.getItem('theme');
+            const prefersLight = window.matchMedia?.('(prefers-color-scheme: light)').matches;
+            const startLight = stored ? stored === 'light' : prefersLight;
+            document.body.classList.toggle('theme-light', startLight);
+            themeToggle?.setAttribute('aria-pressed', String(startLight));
+        })();
+        themeToggle?.addEventListener('click', () => {
+            const toLight = !document.body.classList.contains('theme-light');
+            document.body.classList.toggle('theme-light', toLight);
+            themeToggle.setAttribute('aria-pressed', String(toLight));
+            localStorage.setItem('theme', toLight ? 'light' : 'dark');
+        });
+
+        // ===== Stars (spawn into the two layers) =====
+        const layerMain = document.querySelector('.diamond-layer');
+        const layerMini = document.querySelector('.diamond-mini-layer');
+
+        if (layerMain && layerMini && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+            const rand = (a, b) => Math.random() * (b - a) + a, randi = (a, b) => Math.floor(rand(a, b + 1));
+            const place = el => { el.style.left = `${rand(-5, 105)}vw`; el.style.top = `${rand(-5, 105)}vh`; };
+            const tune = (el, min, max) => {
+                el.style.setProperty('--size', randi(min, max) + 'px');
+                el.style.setProperty('--twinkle', rand(2, 6).toFixed(2) + 's');
+                el.style.animationDelay = (-rand(0, 6)).toFixed(2) + 's';
+            };
+            const spawn = (parent, cls, smin, smax) => {
+                const d = document.createElement('div');
+                d.className = cls; place(d); tune(d, smin, smax); parent.appendChild(d);
+            };
+            for (let i = 0; i < 110; i++) spawn(layerMain, 'diamond', 2, 5);
+            for (let i = 0; i < 120; i++) spawn(layerMini, 'diamond-mini', 1, 2);
+        }
+    </script>
+
+</body>
+
+</html>

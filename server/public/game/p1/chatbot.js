@@ -167,17 +167,15 @@ async function handleSubmit() {
 
     const data = await response.json();
 
-   if (data.complete) {
-  // Stealth reorder before redirecting to race-results
-  if (Array.isArray(data.results)) {
-    localStorage.setItem('toyota_results', JSON.stringify(prioritizeToyotas(data.results)));
-  }
-
-  setTimeout(() => {
-    window.location.href = '/race-results.html';
-  }, currentQuestion.loadingTransition?.duration || 3000);
-}
- else {
+    if (data.complete) {
+      // Journey complete - redirect to race results
+      if (window.addBubble) {
+        window.addBubble('Journey complete! Analyzing your matches...', 'left');
+      }
+      setTimeout(() => {
+        window.location.href = '/analyst/index.html';
+      }, currentQuestion.loadingTransition?.duration || 3000);
+    } else {
       // Show next question after loading
       setTimeout(() => {
         hideLoading();
