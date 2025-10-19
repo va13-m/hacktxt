@@ -12,12 +12,10 @@
 // ---------------------------------------------------------------------------------
 
 // screen size
-const SCREEN_W = 1920;
-const SCREEN_H = 1080;
-
-// coordinates of the screen center
-const SCREEN_CX = SCREEN_W/2;
-const SCREEN_CY = SCREEN_H/2;
+let SCREEN_W = window.innerWidth;
+let SCREEN_H = window.innerHeight;
+let SCREEN_CX = SCREEN_W / 2;
+let SCREEN_CY = SCREEN_H / 2;
 
 // game states
 const STATE_INIT = 1;
@@ -58,11 +56,11 @@ class MainScene extends Phaser.Scene
 	*/
 	create(){
 		// backgrounds
-		this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgBack');
-		this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgSky');
-		this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgHills');
-		this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgCity');
-		
+		// this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgBack');
+		// this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgSky');
+		// this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgHills');
+		// this.sprBack = this.add.image(SCREEN_CX, SCREEN_CY, 'imgCity');
+		this.sprites = [this.add.image(0, 0, 'imgPlayer').setVisible(false)];
 		// array of sprites that will be "manually" drawn on a rendering texture 
 		// (that's why they must be invisible after creation)
 		this.sprites = [];
@@ -124,6 +122,21 @@ class MainScene extends Phaser.Scene
 		this.events.on('resume', function(){
 			this.settings.show();
 		}, this);
+
+
+  this.scale.on('resize', (gameSize) => {
+    SCREEN_W = gameSize.width;
+    SCREEN_H = gameSize.height;
+    SCREEN_CX = SCREEN_W / 2;
+    SCREEN_CY = SCREEN_H / 2;
+
+    // tell subsystems to resize/recalc
+    if (this.circuit?.onResize) this.circuit.onResize();
+    if (this.player?.init) this.player.init();   // recalculates screen.x / screen.y
+    if (this.camera?.init) this.camera.init();   // recalculates projection plane
+  });
+
+
 	}
 
 	/**
@@ -203,9 +216,10 @@ var config = {
     type: Phaser.AUTO,
     width: SCREEN_W,
     height: SCREEN_H,
-	
+	transparent: true, 
+  backgroundColor: 'rgba(0,0,0,0)',
 	scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
 	
