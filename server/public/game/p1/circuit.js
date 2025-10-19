@@ -81,8 +81,8 @@ class Circuit
 	createSegment(){
 		// define colors
 		const COLORS = {
-			LIGHT:	{road: '0x888888', grass: '0x429352', rumble: '0xb8312e'},
-			DARK:	{road: '0x666666', grass: '0x397d46', rumble: '0xDDDDDD', lane: '0xFFFFFF'}
+			LIGHT:	{road: '0x0d1b2a', grass: '0x429352', rumble: '0xd4af37'},
+			DARK:	{road: '0x0d1b2a', grass: '0x397d46', rumble: '0xd4af37', lane: '0xFFFFFF'}
 		};
 		
 		// get the current number of the segments

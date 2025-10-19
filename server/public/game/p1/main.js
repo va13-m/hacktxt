@@ -93,7 +93,7 @@ class MainScene extends Phaser.Scene
                 fontFamily: 'Arial Black', // Bolder font
                 fontSize: '80px', 
                 color: '#FFFFFF',
-                stroke: '#000000',
+                stroke: '#01020eff',
                 strokeThickness: 10 // Thicker stroke
             }).setOrigin(0.5).setVisible(false); // Centered origin, initially invisible
             this.carNameTexts.push(nameText);
