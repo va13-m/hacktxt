@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="/game/p1/chatbot.css" />
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="application-name" content="Pseudo-3D Racer" />
@@ -35,7 +36,7 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        z-index: 1; /* ✅ Below the game, above gradient */
+        z-index: 1; 
         overflow: hidden;
       }
 
@@ -73,7 +74,7 @@
         100% { transform: translate(-50%,-50%) rotate(45deg) scale(0.82); opacity: 0.18; }
       }
 
-      /* Make sure Phaser is on top */
+      /* Ensure Phaser canvas sits above background/star layers */
       canvas {
         position: relative;
         z-index: 5;
@@ -98,15 +99,67 @@
     <div class="diamond-layer"></div>
     <div class="diamond-mini-layer"></div>
 
-    <!-- Script to spawn stars -->
-    <script>
-      const starCount = 75;      // Large stars
-      const miniStarCount = 150; // Smaller stars
+    <!-- Chat overlay (top-left, over the road) -->
+    <div id="chatRoot">
+      <!-- Header -->
+      <div class="card-header">
+        <div class="img-avatar" aria-hidden="true"></div>
+        <h3 class="text-chat">Roadside Assistant</h3>
+      </div>
 
+      <!-- Question banner -->
+      <div class="question-banner">
+        <div id="questionCategory"></div>
+        <h4 id="questionText"></h4>
+        <p id="questionSubtext"></p>
+
+        <div class="action-row">
+          <button id="ttsToggle" type="button">Voice On</button>
+          <button id="replayAudio" type="button" style="display:none;">
+            <span id="replayText">Replay question</span>
+          </button>
+          <button id="backButton" type="button" style="display:none;">← Back</button>
+          <button id="submitButton" type="button">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loadingContainer" style="display:none;">
+        <p id="loadingText"></p>
+      </div>
+
+      <!-- Messages + errors -->
+      <div class="card-body">
+        <div class="messages-container" id="questionContainer"></div>
+        <div id="errorMessage" style="display:none;"><span id="errorText"></span></div>
+      </div>
+
+      <!-- Footer input -->
+      <div class="card-footer">
+        <div class="input-row">
+          <textarea id="answerInput" rows="2" placeholder="Type your answer here…"></textarea>
+          <button class="button-send" type="button" id="sendProxy">Send</button>
+        </div>
+        <div id="examplesContainer" style="display:none; padding:6px 2px 0 2px;">
+          <p style="margin:0; font-size:12px; opacity:.8;">Examples:</p>
+          <div id="examplesList" style="font-size:12px; opacity:.9;"></div>
+        </div>
+        <div id="tooltip" style="display:none; font-size:12px; opacity:.9; padding-top:6px;">
+          <span id="tooltipText"></span>
+        </div>
+      </div>
+
+      <!-- Hidden audio for TTS -->
+      <audio id="ttsAudio"></audio>
+    </div>
+
+    <!-- Stars spawner -->
+    <script>
+      const starCount = 75;
+      const miniStarCount = 150;
       const layer = document.querySelector('.diamond-layer');
       const miniLayer = document.querySelector('.diamond-mini-layer');
 
-      // Create big stars
       for (let i = 0; i < starCount; i++) {
         const star = document.createElement('div');
         star.className = 'diamond';
@@ -116,8 +169,6 @@
         star.style.setProperty('--twinkle', (Math.random() * 4 + 4) + 's');
         layer.appendChild(star);
       }
-
-      // Create mini stars
       for (let i = 0; i < miniStarCount; i++) {
         const star = document.createElement('div');
         star.className = 'diamond-mini';
@@ -127,6 +178,26 @@
         star.style.setProperty('--twinkle', (Math.random() * 5 + 3) + 's');
         miniLayer.appendChild(star);
       }
+    </script>
+
+    <!-- Chat logic (uses your existing chatbot.js) -->
+    <script src="/game/p1/chatbot.js"></script>
+    <script>
+      // Bridge: clicking “Send” should trigger your submit flow
+      document.getElementById('sendProxy')?.addEventListener('click', () => {
+        document.getElementById('submitButton')?.click();
+      });
+
+      // Optional helper to append bubbles from chatbot.js
+      window.addBubble = function (text, side = 'left') {
+        const wrap = document.querySelector('.messages-container');
+        if (!wrap) return;
+        const el = document.createElement('div');
+        el.className = `message-box ${side === 'right' ? 'right' : 'left'}`;
+        el.textContent = text;
+        wrap.appendChild(el);
+        wrap.parentElement.scrollTop = wrap.parentElement.scrollHeight;
+      };
     </script>
   </body>
 </html>
